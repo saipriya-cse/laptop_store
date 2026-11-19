@@ -1,0 +1,413 @@
+
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Laptop Store</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #080d19;
+    color: white;
+}
+
+/* NAVBAR */
+
+.navbar {
+    background: #111827;
+    padding: 18px 7%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.logo {
+    color: #12c9ed;
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.search {
+    flex: 1;
+    max-width: 500px;
+}
+
+.search input {
+    width: 100%;
+    padding: 13px 20px;
+    border: none;
+    outline: none;
+    border-radius: 30px;
+    background: #344155;
+    color: white;
+    font-size: 15px;
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    font-size: 15px;
+}
+
+/* MAIN */
+
+.main {
+    padding: 45px 7%;
+}
+
+.heading {
+    font-size: 25px;
+    margin-bottom: 25px;
+}
+
+/* CATEGORY */
+
+.categories {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 35px;
+}
+
+.categories button {
+    background: #202c40;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.categories button:hover,
+.categories button.active {
+    background: #04bde6;
+    color: #07111e;
+}
+
+/* PRODUCTS */
+
+.products {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+}
+
+.card {
+    background: #151e30;
+    border-radius: 13px;
+    overflow: hidden;
+    border: 1px solid #29364b;
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-7px);
+    border-color: #08bde8;
+}
+
+.image-box {
+    height: 185px;
+    background: #f7f8fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+}
+
+.image-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.card-content {
+    padding: 16px;
+}
+
+.card h3 {
+    font-size: 17px;
+    margin-bottom: 10px;
+}
+
+.description {
+    color: #aab4c5;
+    font-size: 13px;
+    line-height: 1.5;
+    height: 60px;
+    overflow: hidden;
+}
+
+.specs {
+    color: #c2cada;
+    font-size: 12px;
+    line-height: 1.8;
+    margin-top: 10px;
+}
+
+.bottom {
+    border-top: 1px solid #344155;
+    margin-top: 15px;
+    padding-top: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.price {
+    font-size: 19px;
+    font-weight: bold;
+}
+
+.add-btn {
+    background: #078cc9;
+    border: none;
+    color: white;
+    padding: 10px 14px;
+    border-radius: 7px;
+    cursor: pointer;
+}
+
+.add-btn:hover {
+    background: #06bce9;
+    color: #07111e;
+}
+
+.empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 50px;
+    color: #aab4c5;
+}
+
+/* RESPONSIVE */
+
+@media(max-width: 1000px) {
+    .products {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media(max-width: 600px) {
+    .products {
+        grid-template-columns: 1fr;
+    }
+
+    .navbar {
+        padding: 18px 5%;
+    }
+
+    .main {
+        padding: 30px 5%;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+
+<nav class="navbar">
+
+    <div class="logo">💻 LaptopStore</div>
+
+    <div class="search">
+        <input type="text"
+               id="searchInput"
+               placeholder="Search laptops..."
+               onkeyup="searchProducts()">
+    </div>
+
+    <div class="nav-right">
+        <span>👤 Login</span>
+        <span>♡ Wishlist</span>
+        <span>🛒 Cart: <b id="cartCount">0</b></span>
+    </div>
+
+</nav>
+
+<!-- MAIN CONTENT -->
+
+<main class="main">
+
+    <h2 class="heading">Explore Our Laptop Collection</h2>
+
+    <!-- CATEGORY FILTER -->
+
+    <div class="categories">
+
+        <button class="active"
+                onclick="filterBrand('all', this)">
+            All
+        </button>
+
+        <button onclick="filterBrand('dell', this)">
+            Dell
+        </button>
+
+        <button onclick="filterBrand('hp', this)">
+            HP
+        </button>
+
+        <button onclick="filterBrand('lenovo', this)">
+            Lenovo
+        </button>
+
+        <button onclick="filterBrand('asus', this)">
+            Asus
+        </button>
+
+    </div>
+
+    <!-- PRODUCT CARDS -->
+
+    <div class="products" id="productList">
+
+        {% for laptop in laptops %}
+
+        <div class="card"
+             data-brand="{{ laptop.brand|lower }}"
+             data-name="{{ laptop.name|lower }}">
+
+            <div class="image-box">
+
+                {% if laptop.image %}
+                    <img src="{{ laptop.image.url }}"
+                         alt="{{ laptop.name }}">
+                {% else %}
+                    <img src="{% static 'download.jpg' %}"
+                         alt="Laptop">
+                {% endif %}
+
+            </div>
+
+            <div class="card-content">
+
+                <h3>{{ laptop.name }}</h3>
+
+                <p class="description">
+                    {{ laptop.description }}
+                </p>
+
+                <div class="specs">
+                    Brand: {{ laptop.brand }}<br>
+                    RAM: {{ laptop.ram }}<br>
+                    Storage: {{ laptop.storage }}<br>
+                    Processor: {{ laptop.processor }}
+                </div>
+
+                <div class="bottom">
+
+                    <span class="price">
+                        ₹{{ laptop.price }}
+                    </span>
+
+                    <button class="add-btn"
+                            onclick="addToCart()">
+                        Add +
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% empty %}
+
+        <div class="empty">
+            <h2>No Laptops Available</h2>
+            <p>Add products from your admin panel.</p>
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</main>
+
+<script>
+
+// SEARCH PRODUCTS
+
+function searchProducts() {
+
+    let input = document
+        .getElementById("searchInput")
+        .value.toLowerCase();
+
+    let cards = document.querySelectorAll(".card");
+
+    cards.forEach(card => {
+
+        let name = card.dataset.name;
+        let brand = card.dataset.brand;
+
+        card.style.display =
+            name.includes(input) ||
+            brand.includes(input)
+            ? "block" : "none";
+
+    });
+
+}
+
+// BRAND FILTER
+
+function filterBrand(brand, button) {
+
+    let cards = document.querySelectorAll(".card");
+
+    cards.forEach(card => {
+
+        let productBrand = card.dataset.brand;
+
+        card.style.display =
+            brand === "all" || productBrand.includes(brand)
+            ? "block" : "none";
+
+    });
+
+    document.querySelectorAll(".categories button")
+        .forEach(btn => btn.classList.remove("active"));
+
+    button.classList.add("active");
+
+    document.getElementById("searchInput").value = "";
+
+}
+
+// CART COUNTER
+
+let cart = 0;
+
+function addToCart() {
+
+    cart++;
+
+    document.getElementById("cartCount").innerText = cart;
+
+    alert("Product added to cart!");
+
+}
+
+</script>
+
+</body>
+</html>
